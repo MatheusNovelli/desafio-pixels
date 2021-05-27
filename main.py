@@ -30,27 +30,28 @@ def checkforpixels():
     print(greenpixel)
 
 def teste():
-    # The conversion should work equally with a bitmap
+    print("Abrindo a imagem...")
     img = Image.open("Syngenta.bmp")
+    print("Ok!")
+    print("Convertendo imagem para RGB...")
     rgb_im = img.convert('RGB')
-    x = 0
+    print("Ok!")
+    imgX, imgY = rgb_im.size
+    totalpixel = imgX * imgY
     imagepixel = []
+    blackpixel = 0
+    whitepixel = 0
+    greenpixel = 0
 
-    for i in range(rgb_im.size[x]):
-        imagepixel.append(rgb_im.getpixel((i, x)))
-        if x < 299:
-            x += 1
-    print(imagepixel)
-    print(imagepixel.count((0, 0, 0)))
+    print("Contando número de pixels verdes...")
+    for i in range(0, imgX):
+        for j in range(0, imgY):
+            imagepixel.append(rgb_im.getpixel((i, j)))
+    whitepixel = imagepixel.count((255,255,255))
+    blackpixel = imagepixel.count((0,0,0))
+    greenpixel = totalpixel - whitepixel - blackpixel
 
-
-    ##first_row = [rgb_im.getpixel((i, 0)) for i in range(rgb_im.size[0])]
-    # Count how many pixels are black. Note that jpg is not the cleanest of all file formats.
-    # Hence converting to and from jpg usually comes with some losses, i.e. changes in pixel values.
-    #print(first_row.count((255, 255, 255)))  # --> 628
-    #len(first_row)  # --> 680
-
-    #set(first_row)
+    print('O número de pixels verdes do bitmap é:',greenpixel)
 
 def main():
     teste()
