@@ -1,93 +1,64 @@
-import numpy as np
 from PIL import Image
 
-#https://towardsdatascience.com/hiding-data-in-an-image-image-steganography-using-python-e491b68b1372
-
-
-# def checkforpixels():
-#     image = Image.open('Syngenta.bmp')
-
-#     pix = image.load()
-
-
-#     #image.convert("RGB")
-#     imagerow, imagecol = image.size
-#     greenpixel = 0
-
-
-#     color1 = image.getpixel((0, 0))
-#     print(color1)
-
-#     color1 = image.getpixel((0, 0))
-#     print(color1)
-
-#     for i in range(0, imagerow):
-#         for j in range(0, imagecol):
-#             print(pix[i,j])
-#             #imagecolorR, imagecolorG, imagecolorB = image.getpixel((i, j))
-#             #if(imagecolorR != 0 and imagecolorG != 0 and imagecolorB != 0):
-#             #    print(imagecolorR, imagecolorG, imagecolorB)
-#             #if imagepixel != ('color1') and imagepixel != ('color2'):
-#             #    greenpixel += 1
-
-#     print(greenpixel)
 img = Image.open("Syngenta.bmp")
-I = np.asarray(img)
+img = img.convert('RGB')
 imgX, imgY = img.size
+imagepixel = []
 
 
-def teste():
-    print("Abrindo a imagem...")
-    img = Image.open("Syngenta.bmp")
-    print("Ok!")
-    print("Convertendo imagem para RGB...")
-    rgb_im = img.convert('RGB')
-    print("Ok!")
-    imgX, imgY = rgb_im.size
+def checkforpixels():
     totalpixel = imgX * imgY
-    imagepixel = []
-    blackpixel = 0
-    whitepixel = 0
-    greenpixel = 0
 
-    print("Contando número de pixels verdes...")
     for i in range(0, imgX):
         for j in range(0, imgY):
-            imagepixel.append(rgb_im.getpixel((i, j)))
+                imagepixel.append(img.getpixel((i, j))) #Pega as coordenadas do pixel e os insere em uma lista em formato RGB.
+    #Conta as tuplas(RGB) que contém (255,255,255) e (0,0,0), que já são conhecidas por serem as cores branco e preto.
     whitepixel = imagepixel.count((255, 255, 255))
     blackpixel = imagepixel.count((0, 0, 0))
     greenpixel = totalpixel - whitepixel - blackpixel
 
-    print('O número de pixels verdes do bitmap é:', greenpixel)
+    print('O número de pixels pretos do bitmap é:', blackpixel)
+    print('O número de pixels brancos do bitmap é:', whitepixel)
+    print('O número de pixels verdes do bitmap é:', greenpixel, '!!')
 
 
 def converttobinary(message):
-    return [format(i, "08b") for i in message]
+        return format(message, "08b")
 
 
-def imagedecoder(image):
+def imagedecoder1():
     binary = ""
-    for value in image.size:
-        for pixel in value:
-            r, g, b = converttobinary(pixel)
-            binary += r[-1]
-            binary += g[-1]
-            binary += b[-1]
+    for pixel in imagepixel:
+        for value in pixel:
+            rgb = converttobinary(value)
+            binary += rgb[-1]
 
-    bytes = [binary[i: i + 8] for i in range(0, len(binary), 8)]
-
+    allbytes = [binary[i: i + 8] for i in range(0, len(binary), 8)]
     hiddenmessage = ""
-    for byte in bytes:
+    for byte in allbytes:
         hiddenmessage += chr(int(byte, 2))
-        if hiddenmessage[-5:] == "####":
-            break
 
-    return hiddenmessage[-5:]
+    print('Mensagem:', hiddenmessage)
+
+
+def imagedecoder2():
+    binary = ""
+    for pixel in imagepixel:
+        for value in pixel:
+            rgb = converttobinary(value)
+            binary += rgb[-1]
+    intbinary = int(binary, 2)
+    bytenumber = intbinary.bit_length() + 7//8
+    binaryarray = intbinary.to_bytes(bytenumber, "big")
+
+    hiddenmessage = binaryarray.decode()
+    print(hiddenmessage)
 
 
 def main():
-    teste()
-    print(imagedecoder(img))
+    checkforpixels()
+    imagedecoder1()
+    #imagedecoder2()
 
 
 if __name__ == '__main__':
